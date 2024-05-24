@@ -1,8 +1,5 @@
 import requests
 from pdf2docx import Converter
-from dotenv import dotenv_values
-
-config = dotenv_values(".env")
 
 
 def download_pdf(pdf_url, local_pdf_path):
@@ -34,8 +31,8 @@ def upload2CMS(local_docx_path):
             ('asset[upload]',('sample1.docx',open(local_docx_path,'rb'),'application/octet-stream'))
         ]
         headers = {
-            'api_key': config['API_KEY'],
-            'authorization': config['AUTHORIZATION']
+            'api_key': os.environ.get('API_KEY'),
+            'authorization': os.environ.get('AUTHORIZATION')
         }
 
         response = requests.request('POST', url, headers=headers, data=payload, files=files)
