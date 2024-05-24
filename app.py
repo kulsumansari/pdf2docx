@@ -1,7 +1,7 @@
 from flask import Flask, request
 import os
 # import json
-from utility import download_pdf, convertPdf2Docx
+from utility import download_pdf, convertPdf2Docx, upload2CMS
 
 app = Flask(__name__)
 
@@ -27,11 +27,11 @@ def convert():
         # Step 2: Convert PDF to DOCX
         convertPdf2Docx(local_pdf_path, local_docx_path)
 
-        # Step 3: Upload DOCX to Cloudinary
-        # response = upload2CMS(local_docx_path)
+        # Step 3: Upload DOCX to CMS
+        response = upload2CMS(local_docx_path)
         
         # if response.status_code == 201:
-        #     print(f'Process completed successfully:\n {response.json()}')
+            # print(f'Process completed successfully:\n {response.json()}')
 
     finally:
         # Clean up local files

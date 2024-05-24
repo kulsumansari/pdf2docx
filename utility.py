@@ -1,8 +1,8 @@
 import requests
 from pdf2docx import Converter
-# from dotenv import dotenv_values
+from dotenv import dotenv_values
 
-# config = dotenv_values(".env")
+config = dotenv_values(".env")
 
 
 def download_pdf(pdf_url, local_pdf_path):
@@ -23,13 +23,13 @@ def convertPdf2Docx(local_pdf_path, local_docx_path):
     
     
 # upload to CMS
-# def upload2CMS(local_docx_path):
+def upload2CMS(local_docx_path):
     import os
 
     try:
         url = "https://api.contentstack.io/v3/assets"
 
-        payload = {'asset[title]': 'doc2222'}
+        payload = {'asset[title]': 'new test doc 123'}
         files=[
             ('asset[upload]',('sample1.docx',open(local_docx_path,'rb'),'application/octet-stream'))
         ]
