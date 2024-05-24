@@ -20,15 +20,18 @@ def convertPdf2Docx(local_pdf_path, local_docx_path):
     
     
 # upload to CMS
-def upload2CMS(local_docx_path):
+def upload2CMS(local_docx_path, asset):
     import os
 
     try:
+        title = asset['title']
+        filname = asset['filename'].split('.')[1]
+
         url = "https://api.contentstack.io/v3/assets"
 
-        payload = {'asset[title]': 'new test doc 123'}
+        payload = {'asset[title]': title}
         files=[
-            ('asset[upload]',('sample1.docx',open(local_docx_path,'rb'),'application/octet-stream'))
+            ('asset[upload]',(filname+'.docx',open(local_docx_path,'rb'),'application/octet-stream'))
         ]
         headers = {
             'api_key': os.environ.get('API_KEY'),
@@ -36,7 +39,7 @@ def upload2CMS(local_docx_path):
         }
 
         response = requests.request('POST', url, headers=headers, data=payload, files=files)
-        print("🚀 ~ response:", response.text)
+        print("🚀 ~ response:", response.text, response.status_code | 'not')
 
         # print(response)
         # if response.status != 201:
