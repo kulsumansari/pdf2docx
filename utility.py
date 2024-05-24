@@ -25,13 +25,14 @@ def upload2CMS(local_docx_path, asset):
 
     try:
         title = asset['title']
-        filname = asset['filename'].split('.')[1]
+        filename = asset['filename'].split('.')[0] + '.docx'
+        print ('========' + filename + '=======')
 
         url = "https://api.contentstack.io/v3/assets"
 
         payload = {'asset[title]': title}
         files=[
-            ('asset[upload]',(filname+'.docx',open(local_docx_path,'rb'),'application/octet-stream'))
+            ('asset[upload]',(filename ,open(local_docx_path,'rb'),'application/octet-stream'))
         ]
         headers = {
             'api_key': os.environ.get('API_KEY'),
@@ -39,7 +40,7 @@ def upload2CMS(local_docx_path, asset):
         }
 
         response = requests.request('POST', url, headers=headers, data=payload, files=files)
-        print("🚀 ~ response:", response.text, response.status_code | 'not')
+        # print("🚀 ~ response:", response.text, response.status_code)
 
         # print(response)
         # if response.status != 201:

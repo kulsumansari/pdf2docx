@@ -1,6 +1,6 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 import os
-# import json
+import json
 from utility import download_pdf, convertPdf2Docx, upload2CMS
 
 app = Flask(__name__)
@@ -15,7 +15,7 @@ def convert():
 
     pdf_url = asset['url']
 
-    print(pdf_url)
+    # print(pdf_url)
     
     local_pdf_path = '/tmp/temp.pdf'
     local_docx_path = '/tmp/temp.docx'
@@ -31,7 +31,7 @@ def convert():
         response = upload2CMS(local_docx_path, asset)
         
         # if response.status_code == 201:
-            # print(f'Process completed successfully:\n {response.json()}')
+        #     print(f'Process completed successfully:\n {response.json()}')
 
     finally:
         # Clean up local files
@@ -40,7 +40,7 @@ def convert():
         if os.path.exists(local_docx_path):
             os.remove(local_docx_path)
 
-    return jsonify(response), 200
+    return json.dumps(response.text), response.status_code
 
 if __name__ == '__main__':
     app.run(debug=True)
