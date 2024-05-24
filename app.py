@@ -15,7 +15,7 @@ def convert():
 
     pdf_url = asset['url']
 
-    # print(pdf_url)
+    print(pdf_url)
     
     local_pdf_path = '/tmp/temp.pdf'
     local_docx_path = '/tmp/temp.docx'
@@ -40,7 +40,7 @@ def convert():
         if os.path.exists(local_docx_path):
             os.remove(local_docx_path)
 
-    return json.dumps(response.text), response.status_code
+    return {"message": "file converted!!"}, response.status_code
 
 if __name__ == '__main__':
     app.run(debug=True)
