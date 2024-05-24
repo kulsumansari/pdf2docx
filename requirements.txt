@@ -1,3 +1,1 @@
-requests
-pdf2docx
-flask
+Flask==3.0.0
