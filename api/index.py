@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import os
 import json
-from utility import download_pdf, convertPdf2Docx, upload2CMS
+from pdf2docx.api.utility import download_pdf, convertPdf2Docx, upload2CMS
 
 app = Flask(__name__)
 
