@@ -33,6 +33,11 @@ def convert():
         # if response.status_code == 201:
         #     print(f'Process completed successfully:\n {response.json()}')
 
+    except Exception as error:
+        print(f"Error while uploading document: {error}")
+        return {"message": "Some error occured... Check logs"}, 500
+
+
     finally:
         # Clean up local files
         if os.path.exists(local_pdf_path):
