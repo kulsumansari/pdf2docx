@@ -54,10 +54,12 @@ def extract():
         local_pdf_path = '/tmp/extract_text.pdf'
         pdf_url = request.json['url']
         res = extract_text_from_pdf(pdf_url, local_pdf_path)
-        return {"text": res }, 200
+        return {"content": {
+            "paras": res
+        }}, 200
     except Exception as error:
         print(f"Error while extracting text: {error}")
-        return {"error": error}, 500
+        return {"error": str(error)}, 500
     
 
 
