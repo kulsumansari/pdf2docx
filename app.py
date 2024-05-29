@@ -1,7 +1,7 @@
 from flask import Flask, request
 import os
 import json
-from utility import download_pdf, convertPdf2Docx, upload2CMS, extract_text_from_pdf
+from utility import download_pdf, convertPdf2Docx, upload2CMS, extract_text_from_pdf, save_json_to_docx
 
 app = Flask(__name__)
 
@@ -61,6 +61,18 @@ def extract():
         print(f"Error while extracting text: {error}")
         return {"error": str(error)}, 500
     
+@app.route('/json2docx', methods=['POST'])
+def json2docx():
+    try:
+        json_response = request.json['content']
+        output_docx = 'output.docx'
+        print('==============')
+        save_json_to_docx(json_response, output_docx)
+        return {"message": "file converted!!"}, 201
+    
+    except Exception as error:
+        print(f"Error while converting to docx: {error}")
+        return {"error": "Bad request "}, 400
 
 
 if __name__ == '__main__':

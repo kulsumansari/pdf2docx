@@ -1,7 +1,8 @@
 import requests
 from pdf2docx import Converter
+from docx import Document
 import pdfplumber
-import re
+import json
 
 
 def download_pdf(pdf_url, local_pdf_path):
@@ -54,6 +55,24 @@ def convertPdf2Docx(local_pdf_path, local_docx_path):
     print(f"Converted PDF from {local_pdf_path} to DOCX at {local_docx_path}")
     
     
+def save_json_to_docx(json_response, output_docx):
+    # Convert JSON string to Python dictionary
+    
+    # Extract paragraphs from the dictionary
+    paragraphs = json_response.get("paras", [])
+    print(paragraphs)
+
+    # Create a new Word document
+    document = Document()
+    
+    # Add each paragraph to the document
+    for paragraph in paragraphs:
+        document.add_paragraph(paragraph)
+    
+    # Save the document
+    document.save(output_docx)
+
+
 # upload to CMS
 def upload2CMS(local_docx_path, asset):
     import os
