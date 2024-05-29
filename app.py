@@ -1,7 +1,7 @@
 from flask import Flask, request
 import os
 import json
-from utility import download_pdf, convertPdf2Docx, upload2CMS
+from utility import download_pdf, convertPdf2Docx, upload2CMS, extract_text_from_pdf
 
 app = Flask(__name__)
 
@@ -46,6 +46,20 @@ def convert():
             os.remove(local_docx_path)
 
     return {"message": "file converted!!"}, response.status_code
+
+# Post method to accept url of pdf and pass it to extract_text_from_pdf utility
+@app.route('/extract', methods=['POST'])
+def extract():
+    try:
+        local_pdf_path = '/tmp/extract_text.pdf'
+        pdf_url = request.json['url']
+        res = extract_text_from_pdf(pdf_url, local_pdf_path)
+        return {"text": res }, 200
+    except Exception as error:
+        print(f"Error while extracting text: {error}")
+        return {"error": error}, 500
+    
+
 
 if __name__ == '__main__':
     app.run(debug=True)

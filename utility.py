@@ -1,5 +1,7 @@
 import requests
 from pdf2docx import Converter
+import pdfplumber
+import re
 
 
 def download_pdf(pdf_url, local_pdf_path):
@@ -8,6 +10,39 @@ def download_pdf(pdf_url, local_pdf_path):
     with open(local_pdf_path, 'wb') as file:
         file.write(response.content)
     print(f"Downloaded PDF from {pdf_url} to {local_pdf_path}")
+
+
+def extract_text_from_pdf(pdf_url, local_pdf_path):
+    response = requests.get(pdf_url)
+    with open(local_pdf_path, 'wb') as file:
+        file.write(response.content)
+    
+    text = ""
+    paragraphs = []
+    with pdfplumber.open(local_pdf_path) as pdf:
+        header_footer_height=40
+
+        for page in pdf.pages:
+            # width = page.width
+            height = page.height
+            text = ""
+            
+            # Extract text with words and handle links
+            for element in page.extract_words():
+                # Skip elements in the header or footer area
+                if element['top'] > header_footer_height and element['bottom'] < height - header_footer_height:
+                    text += f"{element['text']} "
+            
+
+            if text:
+                # Split the text by double newline to get paragraphs
+                page_paragraphs = text.split('\n\n')
+                paragraphs.extend(page_paragraphs)
+
+    # for i, paragraph in enumerate(paragraphs):
+    #     print(f"Paragraph {i + 1}:\n{paragraph}\n")
+
+    return paragraphs
     
 
 # convert to local docx
