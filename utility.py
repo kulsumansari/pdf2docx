@@ -54,24 +54,22 @@ def convertPdf2Docx(local_pdf_path, local_docx_path):
     cv.close()
     print(f"Converted PDF from {local_pdf_path} to DOCX at {local_docx_path}")
     
-    
-def save_json_to_docx(json_response, output_docx):
-    # Convert JSON string to Python dictionary
-    
-    # Extract paragraphs from the dictionary
-    paragraphs = json_response.get("paras", [])
-    print(paragraphs)
 
-    # Create a new Word document
+
+def save_json_to_docx(content, output_docx):
+    # content is an array of {title, desc}, write the values of these in docx
     document = Document()
     
-    # Add each paragraph to the document
-    for paragraph in paragraphs:
-        document.add_paragraph(paragraph)
+    for item in content:
+        title = item.get('title', '')
+        description = item.get('description', '')
     
-    # Save the document
+        document.add_heading(title, 0)
+        document.add_paragraph(description)
+    
     document.save(output_docx)
-
+    print(f"Saved JSON content to {output_docx}")
+    
 
 # upload to CMS
 def upload2CMS(local_docx_path, asset):

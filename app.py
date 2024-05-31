@@ -1,6 +1,7 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import os
 import json
+import time
 from utility import download_pdf, convertPdf2Docx, upload2CMS, extract_text_from_pdf, save_json_to_docx
 
 app = Flask(__name__)
@@ -61,19 +62,50 @@ def extract():
         print(f"Error while extracting text: {error}")
         return {"error": str(error)}, 500
     
-@app.route('/json2docx', methods=['POST'])
-def json2docx():
+@app.route('/todocx', methods=['POST'])
+def text_2_docx():
     try:
-        json_response = request.json['content']
-        output_docx = 'output.docx'
-        print('==============')
-        save_json_to_docx(json_response, output_docx)
-        return {"message": "file converted!!"}, 201
+        raw_text = request.get_data(as_text=True)
+
+        # Remove ```json at the beginning and ``` at the end
+        if raw_text.startswith('```json'):
+            raw_text = raw_text[len('```json'):].strip()
+        if raw_text.endswith('```'):
+            raw_text = raw_text[:-len('```')].strip()
+
+        # Parse the cleaned JSON text
+        json_data = json.loads(raw_text)
+
+        # Log the received data (for debugging purposes)
+        # print('Received JSON:', json_data)
+
+        # Convert the JSON data to a DOCX file
+        output_docx = '/tmp/output.docx'
+        save_json_to_docx(json_data, output_docx)
+
+        print(f"Converted JSON to DOCX at {output_docx}")
+
+        # generate two variables where title and fiename is timestampped
+        title = str(int(round(time.time() * 1000)))
+        filename = title + '.docx'
+
+        upload2CMS(output_docx, {'title': title, 'filename': filename})
+
+        return {"message": "file Created!!"}, 201
+        
+
+        # Return the JSON data back as the response
+        # return jsonify(json_data), 200
     
     except Exception as error:
         print(f"Error while converting to docx: {error}")
-        return {"error": "Bad request "}, 400
+        return {"error": "Bad request"}, 400
 
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+# output_docx = 'output.docx'
+        # print('==============')
+        # save_json_to_docx(content, output_docx)
+        # return {"message": "file converted!!"}, 201
