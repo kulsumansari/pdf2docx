@@ -17,6 +17,8 @@ def convert():
     pdf_url = asset['url']
 
     print(pdf_url)
+    if asset['filename'].split('.')[1]!= 'pdf':
+        return {"message": "File is not of type PDF"}, 400
     
     local_pdf_path = '/tmp/temp.pdf'
     local_docx_path = '/tmp/temp.docx'
@@ -67,11 +69,11 @@ def text_2_docx():
     try:
         raw_text = request.get_data(as_text=True)
 
-        # Remove ```json at the beginning and ``` at the end
-        if raw_text.startswith('```json'):
-            raw_text = raw_text[len('```json'):].strip()
-        if raw_text.endswith('```'):
-            raw_text = raw_text[:-len('```')].strip()
+        # find the first ```json and last ``` and return the text in between
+        first_json_index = raw_text.find('```json') + 7
+        last_json_index = raw_text.rfind('```')
+        raw_text = raw_text[first_json_index:last_json_index].strip()
+        # print(raw_text)
 
         # Parse the cleaned JSON text
         json_data = json.loads(raw_text)
@@ -88,10 +90,14 @@ def text_2_docx():
                 filename = title + '.docx'
 
                 uploadRes = upload2CMS(output_docx, {'title': title, 'filename': filename})
-                # print(f'upload completed successfully:\n {uploadRes}')
+                print(f'uploaded {uploadRes.status_code}')
                 
                 # Return the JSON data back as the response
-                return uploadRes.json(), uploadRes.status_code
+                if uploadRes:
+                    # print(f'Process completed successfully:\n {uploadRes.json()}')
+                    return uploadRes.json(), uploadRes.status_code
+                else:
+                    return {"Error": "Error while uploading document"}, 422
             
             except Exception as error:
                 print(f"Error while uploading document: {error}")

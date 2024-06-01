@@ -83,12 +83,25 @@ def convert_json_to_docx(content,  document=None):
                 document.add_paragraph(str(value))
 
             elif isinstance(value, list):
-                print(value)
                 for item in value:
                     if isinstance(item, dict):
                         convert_json_to_docx(item, document)
+            
+            elif isinstance(value, dict):
+                document.add_heading(key, 0)
+                for k, v in value.items():
+                    # print(k, '===========')
+                    document.add_heading(k, 1)
+                    if isinstance(v, list):
+                        for item in v:
+                            if isinstance(item, dict):
+                                convert_json_to_docx(item, document)
+                    document.add_paragraph(str(v))
+               
+            else:
+                document.add_paragraph(str(value))
     else:
-        document.add_paragraph(str(item))
+        document.add_paragraph(str(content))
                 
 
     return document
