@@ -120,7 +120,8 @@ def upload2CMS(local_docx_path, asset):
     filename = asset['filename'].split('.')[0] + '.docx'
     print ('========' + filename + '=======')
 
-    url = "https://api.contentstack.io/v3/assets"
+    url = "https://dev11-api.csnonprod.com/v3/assets"
+    # url = "https://api.contentstack.io/v3/assets"
 
     payload = {'asset[title]': title}
     files=[

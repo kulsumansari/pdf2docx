@@ -69,11 +69,10 @@ def text_2_docx():
     try:
         raw_text = request.get_data(as_text=True)
 
-        # find the first ```json and last ``` and return the text in between
+        # if raw_text.find('```json'):
         first_json_index = raw_text.find('```json') + 7
         last_json_index = raw_text.rfind('```')
         raw_text = raw_text[first_json_index:last_json_index].strip()
-        # print(raw_text)
 
         # Parse the cleaned JSON text
         json_data = json.loads(raw_text)
@@ -90,7 +89,7 @@ def text_2_docx():
                 filename = title + '.docx'
 
                 uploadRes = upload2CMS(output_docx, {'title': title, 'filename': filename})
-                print(f'uploaded {uploadRes.status_code}')
+                # print(f'uploaded {uploadRes.json()} {uploadRes.status_code}')
                 
                 # Return the JSON data back as the response
                 if uploadRes:
@@ -109,7 +108,7 @@ def text_2_docx():
 
     
     except Exception as error:
-        print(f"Error while converting to docx: {error}")
+        print(f"Error =========: {error}")
         return {"Error": "Bad Request..."}, 400
 
 
