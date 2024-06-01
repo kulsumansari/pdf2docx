@@ -55,6 +55,8 @@ def convert():
 def extract():
     try:
         local_pdf_path = '/tmp/extract_text.pdf'
+        print("🚀 ~ pdf_url:", request.json)
+
         pdf_url = request.json['url']
         res = extract_text_from_pdf(pdf_url, local_pdf_path)
         return {"content": {
@@ -69,10 +71,10 @@ def text_2_docx():
     try:
         raw_text = request.get_data(as_text=True)
 
-        # if raw_text.find('```json'):
-        first_json_index = raw_text.find('```json') + 7
-        last_json_index = raw_text.rfind('```')
-        raw_text = raw_text[first_json_index:last_json_index].strip()
+        if raw_text.find('```json') >= 0 :
+            first_json_index = raw_text.find('```json') + 7
+            last_json_index = raw_text.rfind('```')
+            raw_text = raw_text[first_json_index:last_json_index].strip()
 
         # Parse the cleaned JSON text
         json_data = json.loads(raw_text)
@@ -109,7 +111,7 @@ def text_2_docx():
     
     except Exception as error:
         print(f"Error =========: {error}")
-        return {"Error": "Bad Request..."}, 400
+        return {"Error": "Bad Request..."+ error}, 400
 
 
 if __name__ == '__main__':
