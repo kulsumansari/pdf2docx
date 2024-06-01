@@ -2,7 +2,6 @@ import requests
 from pdf2docx import Converter
 from docx import Document
 import pdfplumber
-import json
 
 
 def download_pdf(pdf_url, local_pdf_path):
@@ -56,50 +55,69 @@ def convertPdf2Docx(local_pdf_path, local_docx_path):
     
 
 
-def save_json_to_docx(content, output_docx):
-    # content is an array of {title, desc}, write the values of these in docx
-    document = Document()
+def convert_json_to_docx(content,  document=None):
+
+    if document is None:
+        document = Document()
     
-    for item in content:
-        title = item.get('title', '')
-        description = item.get('description', '')
+    # if condition to handle if content is an array of object , and object can have any key
+    if isinstance(content, list):
+        for item in content:
+            if isinstance(item, dict):
+                for key, value in item.items():
+                    if key == 'title':
+                        document.add_heading(str(value), 0)
+                    elif key == 'heading':
+                        document.add_heading(str(value), 1)
+                    else:
+                        document.add_paragraph(str(value))
     
-        document.add_heading(title, 0)
-        document.add_paragraph(description)
-    
+    elif isinstance(content, dict):
+        for key, value in content.items():
+            if (key == 'title'):
+                document.add_heading(str(value), 0)
+            elif key == 'heading':
+                document.add_heading(str(value), 1)
+
+            elif isinstance(value, str):
+                document.add_paragraph(str(value))
+
+            elif isinstance(value, list):
+                print(value)
+                for item in value:
+                    if isinstance(item, dict):
+                        convert_json_to_docx(item, document)
+    else:
+        document.add_paragraph(str(item))
+                
+
+    return document
+
+
+def save_document(document, output_docx):
     document.save(output_docx)
-    print(f"Saved JSON content to {output_docx}")
-    
+    print(f"Converted JSON to DOCX at {output_docx}")
+        
 
 # upload to CMS
 def upload2CMS(local_docx_path, asset):
     import os
 
-    try:
-        title = asset['title']
-        filename = asset['filename'].split('.')[0] + '.docx'
-        print ('========' + filename + '=======')
+    title = asset['title']
+    filename = asset['filename'].split('.')[0] + '.docx'
+    print ('========' + filename + '=======')
 
-        url = "https://api.contentstack.io/v3/assets"
+    url = "https://api.contentstack.io/v3/assets"
 
-        payload = {'asset[title]': title}
-        files=[
-            ('asset[upload]',(filename ,open(local_docx_path,'rb'),'application/octet-stream'))
-        ]
-        headers = {
-            'api_key': os.environ.get('API_KEY'),
-            'authorization': os.environ.get('AUTHORIZATION')
-        }
+    payload = {'asset[title]': title}
+    files=[
+        ('asset[upload]',(filename ,open(local_docx_path,'rb'),'application/octet-stream'))
+    ]
+    headers = {
+        'api_key': os.environ.get('API_KEY'),
+        'authorization': os.environ.get('AUTHORIZATION')
+    }
 
-        response = requests.request('POST', url, headers=headers, data=payload, files=files)
-        # print("🚀 ~ response:", response.text, response.status_code)
+    response = requests.request('POST', url, headers=headers, data=payload, files=files)
 
-        # print(response)
-        # if response.status != 201:
-        #     raise Exception(response.text)
-        
-        return response
-
-    except Exception as error:
-        print(f"Error while uploading document: {error}")
-        return error
+    return response
